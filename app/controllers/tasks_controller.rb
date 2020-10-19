@@ -1,5 +1,7 @@
 class TasksController < ApplicationController
     before_action :task_set, only: [:show, :edit, :update, :destroy]
+    before_action :require_user_logged_in
+    before_action :correct_user, only: [:destroy, :update]
     
     def index
         @tasks = Task.all
@@ -10,11 +12,11 @@ class TasksController < ApplicationController
     end
     
     def new
-        @task = Task.new
+        @task = current_user.tasks.build
     end
     
     def create
-        @task = Task.new(strong_params)
+        @task = current_user.tasks.build(strong_params)
         if @task.save
             flash[:success] = "タスクが作成されました。"
             redirect_to @task
@@ -51,5 +53,13 @@ class TasksController < ApplicationController
         
         def strong_params
             params.require(:task).permit(:content, :status)
+        end
+        
+        def correct_user
+            @task = current_user.tasks.find_by(id: params[:id])
+            unless @task
+                flash[:danger] = "無効な操作です。"
+                redirect_to tasks_url
+            end
         end
 end

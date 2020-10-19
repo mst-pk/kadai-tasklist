@@ -1,7 +1,6 @@
 class TasksController < ApplicationController
-    before_action :task_set, only: [:show, :edit, :update, :destroy]
     before_action :require_user_logged_in
-    before_action :correct_user, only: [:destroy, :update]
+    before_action :correct_user, only: [:show, :edit, :update, :destroy]
     
     def index
         @tasks = Task.all
@@ -47,10 +46,6 @@ class TasksController < ApplicationController
     end
     
     private
-        def task_set
-            @task = Task.find(params[:id])
-        end
-        
         def strong_params
             params.require(:task).permit(:content, :status)
         end
